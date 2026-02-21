@@ -53,7 +53,27 @@ If using Blender, Export → Wavefront (.obj). Make sure the exported options ar
 ### Materials
 - Export: True
 
-## Instructions
+## Quick Start — Flash Pre-built Firmware
+
+Pre-built `.bin` files are in the **`firmware/`** folder. No build tools needed — just `esptool.py`.
+
+```bash
+pip install esptool
+
+esptool.py --chip esp32s3 --port PORT --baud 921600 \
+  --before default_reset --after hard_reset \
+  write_flash --flash_mode qio --flash_size 16MB \
+  0x0      firmware/bootloader.bin \
+  0x8000   firmware/partitions.bin \
+  0xe000   firmware/boot_app0.bin \
+  0x10000  firmware/firmware.bin \
+  0xc90000 firmware/spiffs.bin
+```
+
+Replace `PORT` with your serial port (`/dev/ttyACM0`, `COM3`, etc.).
+See [`firmware/FLASHING.md`](firmware/FLASHING.md) for detailed instructions and alternative methods (web flasher, PlatformIO).
+
+## Building from Source
 
 1. Open the project in VS Code with the PlatformIO extension.
 2. Select **Upload Filesystem Image** from PlatformIO to flash the `data/*.obj` files to SPIFFS.
