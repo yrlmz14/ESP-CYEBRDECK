@@ -55,22 +55,28 @@ If using Blender, Export → Wavefront (.obj). Make sure the exported options ar
 
 ## Quick Start — Flash Pre-built Firmware
 
-Pre-built `.bin` files are in the **`firmware/`** folder. No build tools needed — just `esptool.py`.
+Pre-built `.bin` files are in the **`firmware/`** folder. No build tools needed — just `esptool`.
 
-```bash
+```
 pip install esptool
-
-esptool.py --chip esp32s3 --port PORT --baud 921600 \
-  --before default_reset --after hard_reset \
-  write_flash --flash_mode qio --flash_size 16MB \
-  0x0      firmware/bootloader.bin \
-  0x8000   firmware/partitions.bin \
-  0xe000   firmware/boot_app0.bin \
-  0x10000  firmware/firmware.bin \
-  0xc90000 firmware/spiffs.bin
 ```
 
-Replace `PORT` with your serial port (`/dev/ttyACM0`, `COM3`, etc.).
+`cd` into the `firmware/` folder, then:
+
+**Windows (Command Prompt):** (replace `COM3` with your port)
+```
+esptool --chip esp32s3 --port COM3 --baud 921600 --before default_reset --after hard_reset write_flash --flash_mode qio --flash_size 16MB 0x0 bootloader.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin 0xc90000 spiffs.bin
+```
+
+**Linux / macOS:**
+```bash
+esptool.py --chip esp32s3 --port /dev/ttyACM0 --baud 921600 \
+  --before default_reset --after hard_reset \
+  write_flash --flash_mode qio --flash_size 16MB \
+  0x0 bootloader.bin 0x8000 partitions.bin 0xe000 boot_app0.bin \
+  0x10000 firmware.bin 0xc90000 spiffs.bin
+```
+
 See [`firmware/FLASHING.md`](firmware/FLASHING.md) for detailed instructions and alternative methods (web flasher, PlatformIO).
 
 ## Building from Source

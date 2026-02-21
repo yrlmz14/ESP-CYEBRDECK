@@ -12,11 +12,11 @@ Pre-built binaries for the **ESP32-S3-N16R8** with **Waveshare 2.4" ILI9341 LCD*
 | `firmware.bin` | Application firmware | `0x10000` |
 | `spiffs.bin` | SPIFFS filesystem (3D models) | `0xc90000` |
 
-## Option 1: Flash with esptool.py (recommended)
+## Option 1: Flash with esptool (recommended)
 
 ### Install esptool
 
-```bash
+```
 pip install esptool
 ```
 
@@ -30,10 +30,38 @@ The board should now appear as a USB serial device.
 
 ### Flash everything at once
 
-Replace `PORT` with your serial port (e.g. `/dev/ttyACM0` on Linux, `/dev/cu.usbmodem*` on macOS, `COM3` on Windows).
+Open a terminal / command prompt, `cd` into the `firmware/` folder, then run the command for your OS.
+
+Find your serial port first:
+- **Windows:** Open Device Manager → Ports (COM & LPT) → look for `COM3`, `COM4`, etc.
+- **Linux:** typically `/dev/ttyACM0` or `/dev/ttyUSB0`
+- **macOS:** typically `/dev/cu.usbmodem*`
+
+#### Windows (Command Prompt)
+
+Replace `COM3` with your actual COM port:
+
+```
+esptool --chip esp32s3 --port COM3 --baud 921600 --before default_reset --after hard_reset write_flash --flash_mode qio --flash_size 16MB 0x0 bootloader.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin 0xc90000 spiffs.bin
+```
+
+#### Windows (PowerShell)
+
+```powershell
+esptool --chip esp32s3 --port COM3 --baud 921600 `
+  --before default_reset --after hard_reset `
+  write_flash --flash_mode qio --flash_size 16MB `
+  0x0 bootloader.bin `
+  0x8000 partitions.bin `
+  0xe000 boot_app0.bin `
+  0x10000 firmware.bin `
+  0xc90000 spiffs.bin
+```
+
+#### Linux / macOS
 
 ```bash
-esptool.py --chip esp32s3 --port PORT --baud 921600 \
+esptool.py --chip esp32s3 --port /dev/ttyACM0 --baud 921600 \
   --before default_reset --after hard_reset \
   write_flash --flash_mode qio --flash_size 16MB \
   0x0      bootloader.bin \
@@ -45,16 +73,28 @@ esptool.py --chip esp32s3 --port PORT --baud 921600 \
 
 ### Flash only the firmware (if SPIFFS is already flashed)
 
+**Windows:**
+```
+esptool --chip esp32s3 --port COM3 --baud 921600 write_flash --flash_mode qio --flash_size 16MB 0x10000 firmware.bin
+```
+
+**Linux / macOS:**
 ```bash
-esptool.py --chip esp32s3 --port PORT --baud 921600 \
+esptool.py --chip esp32s3 --port /dev/ttyACM0 --baud 921600 \
   write_flash --flash_mode qio --flash_size 16MB \
   0x10000 firmware.bin
 ```
 
 ### Flash only the 3D models (SPIFFS)
 
+**Windows:**
+```
+esptool --chip esp32s3 --port COM3 --baud 921600 write_flash --flash_mode qio --flash_size 16MB 0xc90000 spiffs.bin
+```
+
+**Linux / macOS:**
 ```bash
-esptool.py --chip esp32s3 --port PORT --baud 921600 \
+esptool.py --chip esp32s3 --port /dev/ttyACM0 --baud 921600 \
   write_flash --flash_mode qio --flash_size 16MB \
   0xc90000 spiffs.bin
 ```
@@ -74,11 +114,8 @@ esptool.py --chip esp32s3 --port PORT --baud 921600 \
 
 ## Option 3: Flash with PlatformIO (if you have the project)
 
-```bash
-# Flash firmware
+```
 pio run -e esp32s3-ili9341 -t upload
-
-# Flash SPIFFS (3D models)
 pio run -e esp32s3-ili9341 -t uploadfs
 ```
 
